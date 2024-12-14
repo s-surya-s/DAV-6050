@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="PostgreSQL" database="PostgreSQL" id="PostgreSQL-161c" >
+	<schema name="citibike_dw" >
+		<table name="date_dim" row_count="639" spec="" >
+			<comment><![CDATA[Stores date-related information for analysis.]]></comment>
+			<column name="date_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<defo><![CDATA[nextval('citibike_dw.date_dim_date_sk_id_seq'::regclass)]]></defo>
+				<comment><![CDATA[Unique identifier for the date]]></comment>
+			</column>
+			<column name="date" type="date" length="0" jt="91" mandatory="y" >
+				<comment><![CDATA[Actual date]]></comment>
+			</column>
+			<column name="year" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Year of the date]]></comment>
+			</column>
+			<column name="quarter" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Quarter of the year (1-4)]]></comment>
+			</column>
+			<column name="month" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Month of the year (1-12)]]></comment>
+			</column>
+			<column name="day" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Day of the month (1-31)]]></comment>
+			</column>
+			<index name="date_dim_pkey" unique="PRIMARY_KEY" >
+				<column name="date_sk_id" />
+			</index>
+		</table>
+		<table name="member_type_dim" row_count="0" spec="" >
+			<comment><![CDATA[Stores information about different types of Citi Bike members]]></comment>
+			<column name="member_type_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<defo><![CDATA[nextval('citibike_dw.member_type_dim_member_type_sk_id_seq'::regclass)]]></defo>
+				<comment><![CDATA[Unique identifier for the member type]]></comment>
+			</column>
+			<column name="member_type_desc" type="text" jt="12" mandatory="y" >
+				<comment><![CDATA[Description of the member type]]></comment>
+			</column>
+			<index name="member_type_dim_pkey" unique="PRIMARY_KEY" >
+				<column name="member_type_sk_id" />
+			</index>
+		</table>
+		<table name="rideable_type_dim" row_count="0" spec="" >
+			<comment><![CDATA[Stores information about different types of bikes.]]></comment>
+			<column name="rideable_type_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<defo><![CDATA[nextval('citibike_dw.rideable_type_dim_rideable_type_sk_id_seq'::regclass)]]></defo>
+				<comment><![CDATA[Unique identifier for the rideable type]]></comment>
+			</column>
+			<column name="rideable_type_desc" type="text" jt="12" mandatory="y" >
+				<comment><![CDATA[Description of the rideable type]]></comment>
+			</column>
+			<index name="rideable_type_dim_pkey" unique="PRIMARY_KEY" >
+				<column name="rideable_type_sk_id" />
+			</index>
+		</table>
+		<table name="rides_fact" row_count="0" spec="" >
+			<comment><![CDATA[Stores aggregated ride information, including date, start/end stations, member type, bike type, weather, usage duration, ride count, and fare]]></comment>
+			<column name="date_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Foreign key referencing the date dimension]]></comment>
+			</column>
+			<column name="start_station_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Foreign key referencing the start station dimension]]></comment>
+			</column>
+			<column name="end_station_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Foreign key referencing the end station dimension]]></comment>
+			</column>
+			<column name="member_type_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Foreign key referencing the member type dimension]]></comment>
+			</column>
+			<column name="rideable_type_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Foreign key referencing the rideable type dimension]]></comment>
+			</column>
+			<column name="weather_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[oreign key referencing the weather dimension]]></comment>
+			</column>
+			<column name="total_usage_seconds" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Total duration of rides in seconds]]></comment>
+			</column>
+			<column name="total_rides_count" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Total number of rides]]></comment>
+			</column>
+			<column name="total_fare" type="integer" length="32" jt="4" mandatory="y" >
+				<comment><![CDATA[Total fare collected for the rides]]></comment>
+			</column>
+			<index name="pk_ride_fact" unique="PRIMARY_KEY" >
+				<column name="date_sk_id" />
+				<column name="start_station_sk_id" />
+				<column name="end_station_sk_id" />
+				<column name="member_type_sk_id" />
+				<column name="rideable_type_sk_id" />
+				<column name="weather_sk_id" />
+			</index>
+			<fk name="rides_fact_date_sk_id_fkey" to_schema="citibike_dw" to_table="date_dim" options="" >
+				<fk_column name="date_sk_id" pk="date_sk_id" />
+			</fk>
+			<fk name="rides_fact_start_station_sk_id_fkey" to_schema="citibike_dw" to_table="station_dim" options="" >
+				<fk_column name="start_station_sk_id" pk="station_sk_id" />
+			</fk>
+			<fk name="rides_fact_end_station_sk_id_fkey" to_schema="citibike_dw" to_table="station_dim" options="" >
+				<fk_column name="end_station_sk_id" pk="station_sk_id" />
+			</fk>
+			<fk name="rides_fact_member_type_sk_id_fkey" to_schema="citibike_dw" to_table="member_type_dim" options="" >
+				<fk_column name="member_type_sk_id" pk="member_type_sk_id" />
+			</fk>
+			<fk name="rides_fact_rideable_type_sk_id_fkey" to_schema="citibike_dw" to_table="rideable_type_dim" options="" >
+				<fk_column name="rideable_type_sk_id" pk="rideable_type_sk_id" />
+			</fk>
+			<fk name="rides_fact_weather_sk_id_fkey" to_schema="citibike_dw" to_table="weather_dim" options="" >
+				<fk_column name="weather_sk_id" pk="weather_sk_id" />
+			</fk>
+		</table>
+		<table name="station_dim" row_count="2386" spec="" >
+			<comment><![CDATA[Stores information about Citi Bike stations]]></comment>
+			<column name="station_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<defo><![CDATA[nextval('citibike_dw.station_dim_station_sk_id_seq'::regclass)]]></defo>
+				<comment><![CDATA[Unique identifier for the station]]></comment>
+			</column>
+			<column name="station_id" type="text" jt="12" mandatory="y" >
+				<comment><![CDATA[Unique identifier for the station in the source system]]></comment>
+			</column>
+			<column name="station_name" type="varchar" length="100" jt="12" mandatory="y" >
+				<comment><![CDATA[Name of the station]]></comment>
+			</column>
+			<column name="station_lat" type="numeric" jt="2" >
+				<comment><![CDATA[Latitude of the station]]></comment>
+			</column>
+			<column name="station_lng" type="numeric" jt="2" >
+				<comment><![CDATA[Longitude of the station]]></comment>
+			</column>
+			<index name="station_dim_pkey" unique="PRIMARY_KEY" >
+				<column name="station_sk_id" />
+			</index>
+		</table>
+		<table name="weather_dim" row_count="0" spec="" >
+			<comment><![CDATA[Stores information about weather conditions]]></comment>
+			<column name="weather_sk_id" type="integer" length="32" jt="4" mandatory="y" >
+				<defo><![CDATA[nextval('citibike_dw.weather_dim_weather_sk_id_seq'::regclass)]]></defo>
+				<comment><![CDATA[Unique identifier for the weather condition]]></comment>
+			</column>
+			<column name="weather_name" type="varchar" length="100" jt="12" mandatory="y" >
+				<comment><![CDATA[Description of the weather condition]]></comment>
+			</column>
+			<index name="weather_dim_pkey" unique="PRIMARY_KEY" >
+				<column name="weather_sk_id" />
+			</index>
+		</table>
+		<sequence name="date_dim_date_sk_id_seq" options="AS integer START WITH 1 INCREMENT BY 1" />
+		<sequence name="member_type_dim_member_type_sk_id_seq" options="AS integer START WITH 1 INCREMENT BY 1" />
+		<sequence name="rideable_type_dim_rideable_type_sk_id_seq" options="AS integer START WITH 1 INCREMENT BY 1" />
+		<sequence name="station_dim_station_sk_id_seq" options="AS integer START WITH 1 INCREMENT BY 1" />
+		<sequence name="weather_dim_weather_sk_id_seq" options="AS integer START WITH 1 INCREMENT BY 1" />
+	</schema>
+	<layout name="Main Layout" id="Layout-1168" show_relation="columns" >
+		<comment><![CDATA[Citibike Data Warehouse Dictionary]]></comment>
+		<entity schema="citibike_dw" name="date_dim" color="BED3F4" x="560" y="96" />
+		<entity schema="citibike_dw" name="member_type_dim" color="BED3F4" x="48" y="288" />
+		<entity schema="citibike_dw" name="rideable_type_dim" color="BED3F4" x="528" y="288" />
+		<entity schema="citibike_dw" name="rides_fact" color="BED3F4" x="304" y="80" />
+		<entity schema="citibike_dw" name="station_dim" color="BED3F4" x="320" y="368" />
+		<entity schema="citibike_dw" name="weather_dim" color="BED3F4" x="80" y="144" />
+		<group name="citibike_data_warehouse" color="ECF0F7" >
+			<entity schema="citibike_dw" name="rides_fact" />
+			<entity schema="citibike_dw" name="weather_dim" />
+			<entity schema="citibike_dw" name="member_type_dim" />
+			<entity schema="citibike_dw" name="date_dim" />
+			<entity schema="citibike_dw" name="rideable_type_dim" />
+			<entity schema="citibike_dw" name="station_dim" />
+		</group>
+	</layout>
+	<layout name="~Layout with Sample Tools" id="Layout-9b2" show_column_type="y" show_relation="columns" >
+		<entity schema="citibike_dw" name="date_dim" color="BED3F4" x="608" y="336" />
+		<entity schema="citibike_dw" name="member_type_dim" color="BED3F4" x="48" y="336" />
+		<entity schema="citibike_dw" name="rideable_type_dim" color="BED3F4" x="320" y="336" />
+		<entity schema="citibike_dw" name="rides_fact" color="BED3F4" x="320" y="48" />
+		<entity schema="citibike_dw" name="station_dim" color="BED3F4" x="608" y="48" />
+		<entity schema="citibike_dw" name="weather_dim" color="BED3F4" x="48" y="160" />
+		<script name="SQL Editor" id="Editor-11a6" language="SQL" >
+			<string><![CDATA[SELECT
+	date_sk_id, start_station_sk_id, end_station_sk_id, member_type_sk_id, rideable_type_sk_id, weather_sk_id, total_usage_seconds, 
+	total_rides_count, total_fare
+FROM
+	citibike_dw.rides_fact t;]]></string>
+		</script>
+		<browser id="Browse-8a3" name="Relational Data Editor" confirm_updates="y" >
+			<browse_table schema="citibike_dw" entity="rides_fact" x="20" y="20" width="270" height="-60" >
+				<browse_table schema="citibike_dw" entity="station_dim" fk="rides_fact_start_station_sk_id_fkey" x="310" y="20" width="500" height="350" record_view="y" />
+			</browse_table>
+		</browser>
+		<query id="Query-240c" name="Query Builder" >
+			<query_table schema="citibike_dw" name="rides_fact" alias="rf" x="48" y="48" >
+				<column name="date_sk_id" />
+				<column name="start_station_sk_id" />
+				<column name="end_station_sk_id" />
+				<column name="member_type_sk_id" />
+				<column name="rideable_type_sk_id" />
+				<column name="weather_sk_id" />
+				<column name="total_usage_seconds" />
+				<column name="total_rides_count" />
+				<column name="total_fare" />
+				<query_table schema="citibike_dw" name="station_dim" alias="sd" x="288" y="48" fk="rides_fact_start_station_sk_id_fkey" type="Inner Join" >
+					<column name="station_sk_id" />
+					<column name="station_id" />
+					<column name="station_name" />
+					<column name="station_lat" />
+					<column name="station_lng" />
+				</query_table>
+			</query_table>
+		</query>
+	</layout>
+</project>
